@@ -1,4 +1,4 @@
-/* Greetfront site: nav, theme toggle, call-strip stepper, copy button. No network, no tracking. */
+/* Greetfront site: nav, theme toggle, hero call timer, copy button. No network, no tracking. */
 (function () {
   'use strict';
   var d = document, root = d.documentElement;
@@ -45,22 +45,15 @@
   });
   labelToggles();
 
-  /* call-strip stepper */
-  var strip = d.querySelector('.strip');
+  /* hero call timer: counts up from the data-tick start; static when reduced motion is requested */
+  var clk = d.querySelector('.phone__time');
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (strip && !reduce) {
-    var panels = strip.querySelectorAll('.strip__panel'), i = 0, timer = null;
-    var show = function () {
-      panels.forEach(function (p, n) { p.classList.toggle('is-active', n === i); });
-    };
-    var start = function () { if (!timer) timer = setInterval(function () { i = (i + 1) % panels.length; show(); }, 2800); };
-    var stop = function () { clearInterval(timer); timer = null; };
-    strip.classList.remove('strip--static');
-    show(); start();
-    strip.addEventListener('mouseenter', stop);
-    strip.addEventListener('mouseleave', start);
-    strip.addEventListener('focusin', stop);
-    strip.addEventListener('focusout', start);
+  if (clk && !reduce) {
+    var secs = parseInt(clk.getAttribute('data-tick'), 10) || 0;
+    setInterval(function () {
+      secs = (secs + 1) % 240; /* calls are capped at 4 minutes */
+      clk.textContent = '0' + Math.floor(secs / 60) + ':' + ('0' + (secs % 60)).slice(-2);
+    }, 1000);
   }
 
   /* copy button (demo page) */
